@@ -53,3 +53,11 @@ Chat messages are stored only in the browser's local storage. Inference happens 
 ## License
 
 MIT
+
+
+## v1.2 low-memory fix
+
+- Auto CPU fallback now uses MOAI Lite (SmolLM2 135M q4, about 182 MB) instead of Qwen 0.5B (~786 MB q4).
+- Qwen remains optional on devices reporting at least 8 GB memory.
+- CPU/WASM is forced to one thread to reduce peak memory.
+- CPU chat history and generated token limits are reduced to keep memory stable.

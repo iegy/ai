@@ -1,7 +1,7 @@
 {
   "name": "MOAI — Local AI Chat",
   "short_name": "MOAI",
-  "description": "Private multi-model AI chat that runs locally using WebGPU or CPU/WASM.",
+  "description": "Private multi-model AI chat that runs locally using WebGPU or a low-memory CPU/WASM fallback.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

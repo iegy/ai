@@ -1,11 +1,14 @@
-const STORAGE_KEY = "moai_state_v2";
+const STORAGE_KEY = "moai_state_v3";
 const WEBLLM_CDN = "https://esm.run/@mlc-ai/web-llm";
-const CPU_MODEL_ID = "onnx-community/Qwen2.5-0.5B-Instruct";
-const CPU_PRESET_ID = "cpu-qwen-0.5b";
+const CPU_LITE_MODEL_ID = "onnx-community/SmolLM2-135M-Instruct-ONNX-MHA";
+const CPU_LITE_PRESET_ID = "cpu-smol-135m";
+const CPU_QWEN_MODEL_ID = "onnx-community/Qwen2.5-0.5B-Instruct";
+const CPU_QWEN_PRESET_ID = "cpu-qwen-0.5b";
 
 const MODEL_PRESETS = [
-  { id: "auto", label: "Auto · Smart", family: "MOAI", runtime: "auto", vram: 0, downloadMB: 0, descAr: "يختار أفضل طريقة تشغيل وموديل لجهازك", descEn: "Chooses the best runtime and model for your device" },
-  { id: CPU_PRESET_ID, modelId: CPU_MODEL_ID, label: "Qwen 2.5 · 0.5B", family: "Qwen", runtime: "wasm", vram: 0, downloadMB: 800, descAr: "وضع CPU/WASM — يعمل بدون WebGPU لكنه أبطأ", descEn: "CPU/WASM mode — works without WebGPU, but slower" },
+  { id: "auto", label: "Auto · Smart", family: "MOAI", runtime: "auto", vram: 0, downloadMB: 0, descAr: "يختار أخف وضع آمن لجهازك تلقائيًا", descEn: "Automatically chooses the safest lightweight runtime for your device" },
+  { id: CPU_LITE_PRESET_ID, modelId: CPU_LITE_MODEL_ID, label: "MOAI Lite · 135M", family: "SmolLM2", runtime: "wasm", dtype: "q4", vram: 0, downloadMB: 182, maxNewTokens: 128, historyTurns: 4, descAr: "أخف وضع CPU/WASM — مناسب للأجهزة قليلة الذاكرة", descEn: "Lightest CPU/WASM mode — for low-memory devices" },
+  { id: CPU_QWEN_PRESET_ID, modelId: CPU_QWEN_MODEL_ID, label: "Qwen 2.5 · 0.5B", family: "Qwen", runtime: "wasm", dtype: "q4", vram: 0, downloadMB: 786, minMemoryGB: 8, maxNewTokens: 192, historyTurns: 6, descAr: "أفضل للعربية لكن يستهلك ذاكرة كبيرة وقد لا يعمل على الأجهزة الضعيفة", descEn: "Better multilingual quality, but uses much more memory and may fail on weaker devices" },
   { id: "Llama-3.2-1B-Instruct-q4f16_1-MLC", label: "Llama 3.2 · 1B", family: "Meta", runtime: "webgpu", vram: 879, descAr: "خفيف وسريع — الأفضل للموبايل والأجهزة المتوسطة", descEn: "Light and fast — best for mobile and mid-range devices" },
   { id: "Llama-3.2-3B-Instruct-q4f16_1-MLC", label: "Llama 3.2 · 3B", family: "Meta", runtime: "webgpu", vram: 2264, descAr: "توازن جيد بين الجودة والسرعة", descEn: "Good balance of quality and speed" },
   { id: "Phi-3.5-mini-instruct-q4f16_1-MLC-1k", label: "Phi 3.5 Mini", family: "Microsoft", runtime: "webgpu", vram: 2520, descAr: "جيد للمنطق والبرمجة على الأجهزة الأقوى", descEn: "Good reasoning and coding on stronger devices" },
@@ -24,8 +27,8 @@ const I18N = {
     clearDataSub: "يمسح المحادثات والإعدادات المحلية، وليس كاش الموديلات.", delete: "حذف", cancel: "إلغاء", continue: "متابعة", noChats: "لا توجد محادثات بعد",
     you: "أنت", copied: "تم النسخ", copy: "نسخ", exportDone: "تم تصدير المحادثة", webgpuReady: "WebGPU جاهز على جهازك",
     webgpuReadySub: "سيستخدم MOAI كارت الشاشة لتشغيل الموديلات الأسرع محليًا.", webgpuMissing: "WebGPU غير متاح — لا مشكلة",
-    webgpuMissingSub: "سيعمل MOAI تلقائيًا بوضع CPU/WASM المحلي. سيكون أبطأ لكنه لا يحتاج API أو خادم.", loadingRuntime: "جارٍ تحميل محرك الذكاء الاصطناعي…",
-    wasmMissing: "هذا المتصفح لا يدعم WebAssembly المطلوب للتشغيل المحلي.", cpuReady: "وضع CPU/WASM متاح", cpuReadySub: "يمكنك تشغيل Qwen 2.5 0.5B محليًا بدون WebGPU.",
+    webgpuMissingSub: "سيعمل MOAI تلقائيًا بوضع Lite منخفض الذاكرة على CPU/WASM. لا يحتاج API أو خادم.", loadingRuntime: "جارٍ تحميل محرك الذكاء الاصطناعي…",
+    wasmMissing: "هذا المتصفح لا يدعم WebAssembly المطلوب للتشغيل المحلي.", cpuReady: "وضع CPU/WASM متاح", cpuReadySub: "سيبدأ MOAI Lite 135M تلقائيًا لأنه أقل استهلاكًا للذاكرة.",
     modelReady: "الموديل جاهز", loadingModel: "تحميل", generationError: "حدث خطأ أثناء تشغيل الموديل", modelNotSupported: "الموديل غير متاح في إصدار المحرك الحالي.",
     deleteChatTitle: "حذف المحادثة؟", deleteChatText: "سيتم حذف هذه المحادثة من هذا الجهاز نهائيًا.", clearAllTitle: "حذف كل بيانات MOAI؟",
     clearAllText: "سيتم حذف كل المحادثات والإعدادات المحفوظة على هذا الجهاز.", newChatTitle: "محادثة جديدة", untitled: "محادثة جديدة",
@@ -46,8 +49,8 @@ const I18N = {
     clearDataSub: "Clears local chats and settings, not downloaded model cache.", delete: "Delete", cancel: "Cancel", continue: "Continue", noChats: "No chats yet",
     you: "You", copied: "Copied", copy: "Copy", exportDone: "Chat exported", webgpuReady: "WebGPU is ready",
     webgpuReadySub: "MOAI will use your GPU for faster local models.", webgpuMissing: "WebGPU unavailable — that's okay",
-    webgpuMissingSub: "MOAI will automatically use local CPU/WASM mode. It is slower, but needs no API or server.", loadingRuntime: "Loading AI runtime…",
-    wasmMissing: "This browser does not support the WebAssembly runtime required for local inference.", cpuReady: "CPU/WASM mode available", cpuReadySub: "Qwen 2.5 0.5B can run locally without WebGPU.",
+    webgpuMissingSub: "MOAI will automatically use the low-memory Lite CPU/WASM fallback. No API or server is needed.", loadingRuntime: "Loading AI runtime…",
+    wasmMissing: "This browser does not support the WebAssembly runtime required for local inference.", cpuReady: "CPU/WASM mode available", cpuReadySub: "MOAI Lite 135M is the default low-memory CPU fallback.",
     modelReady: "Model ready", loadingModel: "Loading", generationError: "An error occurred while running the model", modelNotSupported: "This model is unavailable in the current runtime version.",
     deleteChatTitle: "Delete this chat?", deleteChatText: "This chat will be permanently removed from this device.", clearAllTitle: "Delete all MOAI data?",
     clearAllText: "All local chats and saved settings will be removed from this device.", newChatTitle: "New chat", untitled: "New chat",
@@ -80,6 +83,7 @@ let loadedGpuModelId = null;
 let compatibleModelIds = null;
 let cpuWorker = null;
 let cpuReady = false;
+let cpuLoadedModelId = null;
 let cpuLoadingPromise = null;
 let cpuLoadingResolve = null;
 let cpuLoadingReject = null;
@@ -98,8 +102,13 @@ function loadState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (raw) return { ...defaultState(), ...raw, chats: Array.isArray(raw.chats) ? raw.chats : [], confirmedModels: raw.confirmedModels || {} };
-    const old = JSON.parse(localStorage.getItem("moai_state_v1"));
-    return old ? { ...defaultState(), ...old, chats: Array.isArray(old.chats) ? old.chats : [], confirmedModels: old.confirmedModels || {} } : defaultState();
+    const old = JSON.parse(localStorage.getItem("moai_state_v2")) || JSON.parse(localStorage.getItem("moai_state_v1"));
+    if (old) {
+      const migrated = { ...defaultState(), ...old, chats: Array.isArray(old.chats) ? old.chats : [], confirmedModels: old.confirmedModels || {} };
+      if (migrated.selectedModel === "cpu-qwen-0.5b") migrated.selectedModel = "auto";
+      return migrated;
+    }
+    return defaultState();
   } catch { return defaultState(); }
 }
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -108,7 +117,7 @@ function uid() { return crypto?.randomUUID?.() || `${Date.now()}-${Math.random()
 function activeChat() { return state.chats.find(c => c.id === state.activeChatId) || null; }
 function formatVram(mb) { return mb ? (mb >= 1000 ? `≈ ${(mb/1024).toFixed(1)} GB VRAM` : `≈ ${mb} MB VRAM`) : ""; }
 function autoModelId() {
-  if (!webgpuOk) return CPU_PRESET_ID;
+  if (!webgpuOk) return CPU_LITE_PRESET_ID;
   const mem = Number(navigator.deviceMemory || 4);
   if (mem >= 12) return "Phi-4-mini-instruct-q4f16_1-MLC";
   if (mem >= 8) return "Llama-3.2-3B-Instruct-q4f16_1-MLC";
@@ -118,7 +127,7 @@ function resolvedPreset() {
   const id = state.selectedModel === "auto" ? autoModelId() : state.selectedModel;
   return getPreset(id);
 }
-function getPreset(id) { return MODEL_PRESETS.find(m => m.id === id) || MODEL_PRESETS[1]; }
+function getPreset(id) { return MODEL_PRESETS.find(m => m.id === id) || MODEL_PRESETS.find(m => m.id === CPU_LITE_PRESET_ID) || MODEL_PRESETS[1]; }
 function runtimeLabel(preset = resolvedPreset()) { return preset.runtime === "wasm" ? `CPU/WASM · ${preset.label}` : `WebGPU · ${preset.label}`; }
 
 function applyAppearance() {
@@ -145,7 +154,7 @@ function renderModelPicker() {
   parts.push(`<div class="model-menu-heading">${escapeHtml(t("modelAuto"))}</div>`);
   parts.push(modelOptionHtml(MODEL_PRESETS[0]));
   parts.push(`<div class="model-menu-heading">${escapeHtml(t("modelCpu"))}</div>`);
-  parts.push(modelOptionHtml(getPreset(CPU_PRESET_ID)));
+  MODEL_PRESETS.filter(m => m.runtime === "wasm").forEach(m => parts.push(modelOptionHtml(m)));
   parts.push(`<div class="model-menu-heading">${escapeHtml(t("modelLocal"))}</div>`);
   MODEL_PRESETS.filter(m => m.runtime === "webgpu").forEach(m => parts.push(modelOptionHtml(m)));
   els.modelMenu.innerHTML = parts.join("");
@@ -153,17 +162,23 @@ function renderModelPicker() {
 }
 function modelOptionHtml(m) {
   const desc = state.lang === "ar" ? m.descAr : m.descEn;
-  const disabled = m.runtime === "webgpu" && !webgpuOk;
+  const lowMemoryBlocked = m.runtime === "wasm" && m.minMemoryGB && navigator.deviceMemory && Number(navigator.deviceMemory) < m.minMemoryGB;
+  const disabled = (m.runtime === "webgpu" && !webgpuOk) || lowMemoryBlocked;
   let size = "";
   if (m.id === "auto") size = webgpuOk ? (navigator.deviceMemory ? `${t("deviceMemory")}: ${navigator.deviceMemory} GB` : "WebGPU") : "CPU/WASM";
   else if (m.runtime === "wasm") size = `≈ ${m.downloadMB} MB · CPU/WASM`;
   else size = formatVram(m.vram);
-  return `<button class="model-option ${state.selectedModel===m.id?'selected':''} ${disabled?'unavailable':''}" type="button" role="option" aria-selected="${state.selectedModel===m.id}" data-model-id="${escapeAttr(m.id)}" ${disabled?'disabled':''}><strong>${escapeHtml(m.label)}</strong><small>${escapeHtml(desc)}</small><span class="model-size">${escapeHtml(size)}${disabled ? ` · ${escapeHtml(t("requiresWebgpu"))}` : ''}</span></button>`;
+  const unavailableReason = lowMemoryBlocked ? (state.lang === "ar" ? `يتطلب ذاكرة جهاز ${m.minMemoryGB} GB أو أكثر` : `Needs ${m.minMemoryGB} GB device memory or more`) : (disabled ? t("requiresWebgpu") : "");
+  return `<button class="model-option ${state.selectedModel===m.id?'selected':''} ${disabled?'unavailable':''}" type="button" role="option" aria-selected="${state.selectedModel===m.id}" data-model-id="${escapeAttr(m.id)}" ${disabled?'disabled':''}><strong>${escapeHtml(m.label)}</strong><small>${escapeHtml(desc)}</small><span class="model-size">${escapeHtml(size)}${unavailableReason ? ` · ${escapeHtml(unavailableReason)}` : ''}</span></button>`;
 }
 
 async function selectModel(id) {
   const preset = getPreset(id);
   if (preset.runtime === "webgpu" && !webgpuOk) { toast(t("gpuUnavailableFallback")); return; }
+  if (preset.runtime === "wasm" && preset.minMemoryGB && navigator.deviceMemory && Number(navigator.deviceMemory) < preset.minMemoryGB) {
+    toast(state.lang === "ar" ? "هذا الموديل ثقيل على ذاكرة جهازك. استخدم MOAI Lite." : "This model is too memory-heavy for your device. Use MOAI Lite.");
+    return;
+  }
   state.selectedModel = id;
   saveState(); renderModelPicker(); hideModelMenu(); updateDeviceStatus();
   els.runtimeBadge.textContent = state.selectedModel === "auto" ? (webgpuOk ? "Auto · WebGPU" : "Auto · CPU/WASM") : (preset.runtime === "wasm" ? "CPU/WASM" : "WebGPU");
@@ -256,7 +271,7 @@ async function initDevice() {
     try { webgpuOk = !!(await navigator.gpu.requestAdapter()); } catch { webgpuOk = false; }
   }
   if (!webgpuOk && state.selectedModel !== "auto" && getPreset(state.selectedModel).runtime === "webgpu") {
-    state.selectedModel = CPU_PRESET_ID; saveState();
+    state.selectedModel = CPU_LITE_PRESET_ID; saveState();
   }
   renderModelPicker();
   updateDeviceStatus();
@@ -309,8 +324,8 @@ async function confirmModelDownload(preset) {
 async function ensureRuntime() {
   let preset = resolvedPreset();
   if (preset.runtime === "webgpu" && !webgpuOk) {
-    state.selectedModel = CPU_PRESET_ID; saveState(); renderModelPicker(); updateDeviceStatus(); toast(t("gpuUnavailableFallback"));
-    preset = getPreset(CPU_PRESET_ID);
+    state.selectedModel = CPU_LITE_PRESET_ID; saveState(); renderModelPicker(); updateDeviceStatus(); toast(t("gpuUnavailableFallback"));
+    preset = getPreset(CPU_LITE_PRESET_ID);
   }
   if (preset.runtime === "wasm") return ensureCpuRuntime(preset);
   return ensureGpuRuntime(preset);
@@ -367,9 +382,11 @@ function onCpuWorkerMessage(event) {
   if (data.type === "status") { showProgress(0.02, data.text || t("loadingRuntime")); return; }
   if (data.type === "ready") {
     cpuReady = true;
+    cpuLoadedModelId = data.modelId || cpuLoadedModelId;
     cpuLoadingResolve?.(true);
     cpuLoadingResolve = cpuLoadingReject = null; cpuLoadingPromise = null;
-    hideProgress(); els.runtimeBadge.textContent = `CPU/WASM · Qwen 0.5B`; updateDeviceStatus(); toast(`${t("modelReady")}: Qwen 2.5 · 0.5B`);
+    const readyPreset = MODEL_PRESETS.find(m => m.modelId === cpuLoadedModelId) || resolvedPreset();
+    hideProgress(); els.runtimeBadge.textContent = `CPU/WASM · ${readyPreset.label}`; updateDeviceStatus(); toast(`${t("modelReady")}: ${readyPreset.label}`);
     return;
   }
   if (data.type === "token" && cpuActiveGeneration && data.requestId === cpuActiveGeneration.requestId) {
@@ -386,13 +403,20 @@ function onCpuWorkerMessage(event) {
 }
 async function ensureCpuRuntime(preset) {
   if (!wasmOk) throw new Error(t("wasmMissing"));
-  if (cpuReady && cpuWorker) return { kind: "cpu", preset, worker: cpuWorker };
+  if (cpuReady && cpuWorker && cpuLoadedModelId === preset.modelId) return { kind: "cpu", preset, worker: cpuWorker };
   if (!(await confirmModelDownload(preset))) throw new Error("MODEL_DOWNLOAD_CANCELLED");
+
+  if (cpuWorker && cpuLoadedModelId && cpuLoadedModelId !== preset.modelId) {
+    try { cpuWorker.terminate(); } catch {}
+    cpuWorker = null; cpuReady = false; cpuLoadedModelId = null;
+    cpuLoadingPromise = null; cpuLoadingResolve = cpuLoadingReject = null;
+  }
+
   ensureCpuWorker();
   if (!cpuLoadingPromise) {
     cpuLoadingPromise = new Promise((resolve, reject) => { cpuLoadingResolve = resolve; cpuLoadingReject = reject; });
     showProgress(0, t("loadingRuntime"));
-    cpuWorker.postMessage({ type: "load", modelId: preset.modelId });
+    cpuWorker.postMessage({ type: "load", modelId: preset.modelId, dtype: preset.dtype || "q4" });
   }
   await cpuLoadingPromise;
   return { kind: "cpu", preset, worker: cpuWorker };
@@ -419,7 +443,8 @@ async function sendMessage(text) {
     const system = state.lang === "ar"
       ? "أنت MOAI، مساعد ذكاء اصطناعي مفيد ودقيق. أجب بلغة المستخدم. إذا لم تكن متأكدًا فقل ذلك بوضوح. استخدم Markdown عند الحاجة."
       : "You are MOAI, a helpful and precise AI assistant. Reply in the user's language. If uncertain, say so clearly. Use Markdown when useful.";
-    const history = chat.messages.filter(m=>m.id!==aiMsg.id).slice(-12).map(m=>({role:m.role,content:m.content}));
+    const historyLimit = runtime.kind === "cpu" ? Math.max(2, Number(runtime.preset.historyTurns || 4) * 2) : 12;
+    const history = chat.messages.filter(m=>m.id!==aiMsg.id).slice(-historyLimit).map(m=>({role:m.role,content:m.content}));
     const messages = [{role:"system",content:system}, ...history];
 
     if (runtime.kind === "webgpu") {
@@ -429,7 +454,7 @@ async function sendMessage(text) {
         if (delta) { aiMsg.content += delta; patchStreamingMessage(aiMsg); }
       }
     } else {
-      await generateOnCpu(messages, aiMsg);
+      await generateOnCpu(messages, aiMsg, runtime.preset);
     }
     aiMsg.streaming=false; chat.updatedAt=Date.now(); saveState(); renderMessages(); renderChatList();
   } catch (err) {
@@ -447,7 +472,7 @@ async function sendMessage(text) {
   } finally { hideProgress(); setGenerating(false); updateDeviceStatus(); }
 }
 
-function generateOnCpu(messages, aiMsg) {
+function generateOnCpu(messages, aiMsg, preset) {
   if (!cpuWorker) throw new Error("CPU runtime is not ready");
   const requestId = uid();
   return new Promise((resolve, reject) => {
@@ -460,9 +485,10 @@ function generateOnCpu(messages, aiMsg) {
     cpuWorker.postMessage({
       type: "generate",
       requestId,
-      modelId: CPU_MODEL_ID,
+      modelId: preset.modelId,
+      dtype: preset.dtype || "q4",
       messages,
-      options: { temperature: Number(state.temperature), max_new_tokens: 256 }
+      options: { temperature: Number(state.temperature), max_new_tokens: Number(preset.maxNewTokens || 128) }
     });
   });
 }
@@ -478,7 +504,7 @@ async function stopGeneration() {
   const preset = resolvedPreset();
   if (preset.runtime === "wasm" && cpuWorker) {
     const active = cpuActiveGeneration;
-    cpuWorker.terminate(); cpuWorker = null; cpuReady = false; cpuLoadingPromise = null; cpuLoadingResolve = cpuLoadingReject = null;
+    cpuWorker.terminate(); cpuWorker = null; cpuReady = false; cpuLoadedModelId = null; cpuLoadingPromise = null; cpuLoadingResolve = cpuLoadingReject = null;
     cpuActiveGeneration = null;
     active?.reject?.(new Error("CPU_GENERATION_STOPPED"));
     toast(t("stopCpuNote"));
@@ -523,7 +549,7 @@ function wireEvents() {
   els.settingsBtn.addEventListener("click",()=>{els.settingsDialog.showModal();closeMobileSidebar();});
   els.languageSelect.addEventListener("change",()=>{state.lang=els.languageSelect.value;saveState();applyAppearance();});
   els.temperatureRange.addEventListener("input",()=>{state.temperature=Number(els.temperatureRange.value);els.temperatureValue.textContent=state.temperature.toFixed(1);saveState();});
-  els.clearDataBtn.addEventListener("click",()=>confirmAction(t("clearAllTitle"),t("clearAllText"),()=>{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem("moai_state_v1");state=defaultState();applyAppearance();els.settingsDialog.close();toast(t("delete"));}));
+  els.clearDataBtn.addEventListener("click",()=>confirmAction(t("clearAllTitle"),t("clearAllText"),()=>{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem("moai_state_v2");localStorage.removeItem("moai_state_v1");state=defaultState();applyAppearance();els.settingsDialog.close();toast(t("delete"));}));
   els.confirmDialog.addEventListener("close",()=>{if(els.confirmDialog.returnValue==="default"&&pendingConfirm){const fn=pendingConfirm;pendingConfirm=null;fn();}else pendingConfirm=null;});
   els.shareBtn.addEventListener("click",exportChat);
   els.openSidebar.addEventListener("click",openMobileSidebar); els.closeSidebar.addEventListener("click",closeMobileSidebar); els.backdrop.addEventListener("click",closeMobileSidebar);

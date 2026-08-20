@@ -1,4 +1,4 @@
-const CACHE = 'moai-static-v2';
+const CACHE = 'moai-static-v3';
 const ASSETS = ['./','./index.html','./assets/styles.css','./assets/app.js','./assets/cpu-worker.js','./assets/logo.svg','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install', event => {
