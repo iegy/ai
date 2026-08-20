@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111214" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="description" content="MOAI — Private multi-model AI chat that runs locally in your browser using WebGPU." />
+  <meta name="application-name" content="MOAI" />
+  <meta property="og:title" content="MOAI — Local AI Chat" />
+  <meta property="og:description" content="Private, multi-model AI chat. Runs locally in your browser." />
+  <meta property="og:type" content="website" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <title>MOAI — Local AI Chat</title>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <div id="mobileBackdrop" class="backdrop" hidden></div>
+
+    <aside id="sidebar" class="sidebar" aria-label="المحادثات">
+      <div class="brand-row">
+        <button id="brandHome" class="brand" type="button" aria-label="MOAI home">
+          <img src="./assets/logo.svg" class="brand-logo" alt="MOAI" />
+          <span class="brand-word">MOAI</span>
+        </button>
+        <button id="closeSidebar" class="icon-btn mobile-only" type="button" aria-label="إغلاق القائمة">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+
+      <button id="newChatBtn" class="new-chat-btn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span data-i18n="newChat">محادثة جديدة</span>
+      </button>
+
+      <div class="sidebar-section-label" data-i18n="chats">المحادثات</div>
+      <nav id="chatList" class="chat-list" aria-label="Saved chats"></nav>
+
+      <div class="sidebar-bottom">
+        <button id="installBtn" class="sidebar-action" type="button" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 19h14"/></svg>
+          <span data-i18n="install">تثبيت MOAI</span>
+        </button>
+        <button id="settingsBtn" class="sidebar-action" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.37a1.7 1.7 0 0 0-1 .63 1.7 1.7 0 0 0-.37 1.07V21h-4v-.08A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.23 15a1.7 1.7 0 0 0-.63-1A1.7 1.7 0 0 0 2.53 13.6H2v-4h.53A1.7 1.7 0 0 0 4.06 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.43 4.2a1.7 1.7 0 0 0 1-.63A1.7 1.7 0 0 0 9.8 2.5V2h4v.5a1.7 1.7 0 0 0 1 1.53 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 .63 1 1.7 1.7 0 0 0 1.07.37H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+          <span data-i18n="settings">الإعدادات</span>
+        </button>
+        <div class="privacy-chip">
+          <span class="privacy-dot"></span>
+          <span data-i18n="localPrivate">محلي وخاص على جهازك</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-side">
+          <button id="openSidebar" class="icon-btn mobile-only" type="button" aria-label="فتح القائمة">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+        </div>
+
+        <div class="model-picker-wrap">
+          <button id="modelPickerBtn" class="model-picker" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span class="model-dot"></span>
+            <span id="selectedModelLabel">Auto · Smart</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg>
+          </button>
+          <div id="modelMenu" class="model-menu" role="listbox" hidden></div>
+        </div>
+
+        <div class="topbar-side topbar-actions">
+          <button id="shareBtn" class="icon-btn" type="button" aria-label="تصدير المحادثة" title="Export">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L8 8m4-4 4 4M5 13v6h14v-6"/></svg>
+          </button>
+          <button id="themeBtn" class="icon-btn" type="button" aria-label="تغيير المظهر">
+            <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.4-.03-.8-.08-1.18A7 7 0 0 1 12 3Z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <section id="chatViewport" class="chat-viewport">
+        <div id="emptyState" class="empty-state">
+          <div class="hero-mark"><img src="./assets/logo.svg" alt="" /></div>
+          <h1>MOAI</h1>
+          <p data-i18n="heroSubtitle">ذكاء اصطناعي متعدد النماذج يعمل على جهازك مباشرة.</p>
+
+          <div id="webgpuStatus" class="status-card" role="status">
+            <span class="status-spinner" aria-hidden="true"></span>
+            <div>
+              <strong data-i18n="checkingDevice">جارٍ فحص جهازك…</strong>
+              <small data-i18n="checkingDeviceSub">نحدد دعم WebGPU وأفضل موديل لك.</small>
+            </div>
+          </div>
+
+          <div class="suggestion-grid">
+            <button class="suggestion" data-prompt-ar="اشرح لي فكرة تقنية معقدة بطريقة بسيطة" data-prompt-en="Explain a complex technical idea in simple terms">
+              <span class="suggestion-icon">✦</span><span data-i18n="suggest1">اشرح فكرة معقدة ببساطة</span>
+            </button>
+            <button class="suggestion" data-prompt-ar="ساعدني في كتابة كود نظيف لهذه الفكرة" data-prompt-en="Help me write clean code for an idea">
+              <span class="suggestion-icon">&lt;/&gt;</span><span data-i18n="suggest2">ساعدني في كتابة كود</span>
+            </button>
+            <button class="suggestion" data-prompt-ar="لخص هذا الموضوع في نقاط عملية" data-prompt-en="Summarize a topic into practical points">
+              <span class="suggestion-icon">≡</span><span data-i18n="suggest3">لخّص موضوعًا بسرعة</span>
+            </button>
+            <button class="suggestion" data-prompt-ar="اقترح لي أفكارًا جديدة وغير تقليدية" data-prompt-en="Give me fresh, unconventional ideas">
+              <span class="suggestion-icon">◎</span><span data-i18n="suggest4">اقترح أفكارًا جديدة</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+      </section>
+
+      <div id="modelProgress" class="model-progress" hidden>
+        <div class="progress-meta">
+          <span id="progressText" data-i18n="preparingModel">جارٍ تجهيز الموديل…</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+        <small id="progressHint" data-i18n="firstLoadHint">أول تحميل فقط قد يكون كبيرًا، وبعده يُحفظ في كاش المتصفح.</small>
+      </div>
+
+      <footer class="composer-area">
+        <form id="composerForm" class="composer">
+          <textarea id="promptInput" rows="1" maxlength="16000" data-i18n-placeholder="placeholder" placeholder="اكتب رسالتك إلى MOAI…" aria-label="Message"></textarea>
+          <div class="composer-bottom">
+            <div class="composer-tools">
+              <span id="runtimeBadge" class="runtime-badge">WebGPU</span>
+            </div>
+            <button id="sendBtn" class="send-btn" type="submit" aria-label="إرسال">
+              <svg class="send-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-5 5m5-5 5 5"/></svg>
+              <svg class="stop-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+            </button>
+          </div>
+        </form>
+        <div class="composer-note" data-i18n="disclaimer">قد يخطئ MOAI. تحقّق من المعلومات المهمة. المعالجة تتم محليًا على جهازك.</div>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="settingsDialog" class="modal">
+    <form method="dialog" class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 data-i18n="settings">الإعدادات</h2>
+          <p data-i18n="settingsSub">خصص تجربة MOAI على هذا الجهاز.</p>
+        </div>
+        <button class="icon-btn" value="cancel" aria-label="Close" type="submit"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+
+      <div class="setting-row">
+        <div><strong data-i18n="language">اللغة</strong><small data-i18n="languageSub">واجهة عربية أو إنجليزية</small></div>
+        <select id="languageSelect">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <div><strong data-i18n="temperature">الإبداع</strong><small data-i18n="temperatureSub">أقل = أدق، أعلى = أكثر تنوعًا</small></div>
+        <div class="range-wrap"><input id="temperatureRange" type="range" min="0" max="1.2" value="0.7" step="0.1" /><span id="temperatureValue">0.7</span></div>
+      </div>
+
+      <div class="setting-row">
+        <div><strong data-i18n="clearData">حذف كل البيانات</strong><small data-i18n="clearDataSub">يمسح المحادثات والإعدادات المحلية، وليس كاش الموديلات.</small></div>
+        <button id="clearDataBtn" class="danger-btn" type="button" data-i18n="delete">حذف</button>
+      </div>
+
+      <div class="about-panel">
+        <img src="./assets/logo.svg" alt="" />
+        <div><strong>MOAI</strong><small>Local Multi‑Model AI · v1.0.0</small></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmDialog" class="modal small-modal">
+    <form method="dialog" class="modal-card">
+      <div class="modal-head">
+        <div><h2 id="confirmTitle">تأكيد</h2><p id="confirmText"></p></div>
+      </div>
+      <div class="dialog-actions">
+        <button id="confirmCancel" class="secondary-btn" value="cancel" type="submit" data-i18n="cancel">إلغاء</button>
+        <button id="confirmOk" class="primary-btn" value="default" type="submit" data-i18n="continue">متابعة</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+
+  <script type="module" src="./assets/app.js"></script>
+</body>
+</html>
